@@ -1,0 +1,69 @@
+/*
+Create these one at a time with Modeling > New measure.
+The measures can be stored in Orders or in a dedicated Measures table.
+*/
+
+Total Sales =
+SUM ( Orders[Sales] )
+
+Total Profit =
+SUM ( Orders[Profit] )
+
+Units Sold =
+SUM ( Orders[Quantity] )
+
+Order Count =
+DISTINCTCOUNT ( Orders[Order ID] )
+
+Customer Count =
+DISTINCTCOUNT ( Orders[Customer ID] )
+
+Profit Margin =
+DIVIDE ( [Total Profit], [Total Sales], 0 )
+
+Average Order Value =
+DIVIDE ( [Total Sales], [Order Count], 0 )
+
+Average Discount =
+AVERAGE ( Orders[Discount] )
+
+Sales Previous Year =
+CALCULATE ( [Total Sales], DATEADD ( DimDate[Date], -1, YEAR ) )
+
+Sales YoY Change =
+[Total Sales] - [Sales Previous Year]
+
+Sales YoY % =
+DIVIDE ( [Sales YoY Change], [Sales Previous Year] )
+
+Profit Previous Year =
+CALCULATE ( [Total Profit], DATEADD ( DimDate[Date], -1, YEAR ) )
+
+Profit YoY Change =
+[Total Profit] - [Profit Previous Year]
+
+Profit YoY % =
+DIVIDE ( [Profit YoY Change], [Profit Previous Year] )
+
+Sales YTD =
+TOTALYTD ( [Total Sales], DimDate[Date] )
+
+Profit YTD =
+TOTALYTD ( [Total Profit], DimDate[Date] )
+
+Loss-Making Products =
+COUNTROWS (
+    FILTER (
+        VALUES ( DimProduct[Product ID] ),
+        [Total Profit] < 0
+    )
+)
+
+Product Sales Rank =
+RANKX (
+    ALL ( DimProduct[Product Name] ),
+    [Total Sales],
+    ,
+    DESC,
+    DENSE
+)

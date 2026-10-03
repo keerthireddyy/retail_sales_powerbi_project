@@ -1,0 +1,52 @@
+/*
+Create each table separately in Power BI: Modeling > New table.
+Create these after loading/renaming the Power Query table to Orders.
+*/
+
+// 1) Calendar table
+DimDate =
+VAR FirstOrderDate = MINX ( ALL ( Orders ), Orders[Order Date] )
+VAR LastOrderDate = MAXX ( ALL ( Orders ), Orders[Order Date] )
+RETURN
+    ADDCOLUMNS (
+        CALENDAR (
+            DATE ( YEAR ( FirstOrderDate ), 1, 1 ),
+            DATE ( YEAR ( LastOrderDate ), 12, 31 )
+        ),
+        "Year", YEAR ( [Date] ),
+        "Quarter", "Q" & INT ( ( MONTH ( [Date] ) + 2 ) / 3 ),
+        "Month Number", MONTH ( [Date] ),
+        "Month", FORMAT ( [Date], "MMM" ),
+        "Year-Month", FORMAT ( [Date], "yyyy-MM" ),
+        "Year-Month Sort", YEAR ( [Date] ) * 100 + MONTH ( [Date] ),
+        "Month Start", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 )
+    )
+
+// 2) Product dimension
+DimProduct =
+DISTINCT (
+    SELECTCOLUMNS (
+        Orders,
+        "Product ID", Orders[Product ID],
+        "Product Name", Orders[Product Name],
+        "Category", Orders[Category],
+        "Sub-Category", Orders[Sub-Category]
+    )
+)
+
+// 3) Customer dimension
+DimCustomer =
+DISTINCT (
+    SELECTCOLUMNS (
+        Orders,
+        "Customer ID", Orders[Customer ID],
+        "Customer Name", Orders[Customer Name],
+        "Segment", Orders[Segment]
+    )
+)
+
+// 4) Region dimension
+DimRegion =
+DISTINCT (
+    SELECTCOLUMNS ( Orders, "Region", Orders[Region] )
+)

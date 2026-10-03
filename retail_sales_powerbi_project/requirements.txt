@@ -1,0 +1,2 @@
+# No third-party Python packages are required.
+# Requires Python 3.9+ for the built-in csv, random, datetime, and pathlib modules.
